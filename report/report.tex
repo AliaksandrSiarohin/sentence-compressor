@@ -1,0 +1,159 @@
+%\documentclass[a4paper,12pt,oneside,draft]{article}
+\documentclass[a4paper,12pt,oneside]{article}
+
+% In the original writelatex tamplate
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+
+% By LoCigno
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{csvsimple}
+\usepackage{color}
+\usepackage{url}
+\usepackage{hyperref} 
+\usepackage{cleveref}
+
+% By Davide
+\usepackage{comment}
+\usepackage{booktabs}
+\usepackage{color}
+
+%Variables macros
+\newcommand{\DefineVar}[2]{%
+  \expandafter\newcommand\csname var-#1\endcsname{#2}%
+} 
+\newcommand{\var}[1]{\csname var-#1\endcsname}
+
+\usepackage{courier}
+\newcommand{\mono}[1]{\texttt{#1}}
+%\newcommand{\mono}[1]{\texttt{\textbf{#1}}}
+
+\title{Implementation of BenOR algorithm using C++ and MPI}
+
+\author{Aliaksandr Siarohin}
+
+\date{\today}
+
+\begin{document}
+%\maketitle
+\makeatletter  % populates \@title, \@author, \@date
+\begin{titlepage}
+      \centering
+      ~~~~~~~~~~~~~\\[-30mm]
+      \includegraphics[keepaspectratio=true, width=7cm]{bg_eng_1r.jpg} \\[10mm]
+
+     {
+     \large \bfseries Master Degree in Computer Science\\[3mm] 
+     Distributed Algorithms\\[3mm]
+     AA 2015-2016
+     }\\[10mm]
+
+     %--------------------------------
+     % Set the title, author, and date
+     % 
+
+     \vspace{0.5cm}
+     {
+     \Large \bfseries \textcolor{blue}{\@title} \par
+     }
+     \vspace{0.5cm}
+%      {
+%      \large {Group N. 1} \par
+%      }
+     \vspace{0.2cm}
+
+     {\large {\@author}}
+     \\ \vspace{.2cm}
+     \@date
+
+     \vspace{0.6cm}
+
+    %-----------------------------------
+
+\begin{abstract}
+
+\textit{
+  This is a description of project on distributed algorithms course.
+}
+
+
+\end{abstract}
+
+\end{titlepage}
+
+
+
+\section {Introduction to the designed system/experiment (project work)}
+
+\section {The analytical model}
+
+\subsection{Pre-processing (stemming, lemmatization, tokenization…)}
+
+\subsection{Weigthing Schemes (if used)}
+
+\subsection{Feature Selectors if used}
+    
+\subsection{ Formal description of any new model added}   
+        
+\section{Initial Software description (brief)}
+
+\subsection{Used Functions}
+
+\subsection{Interface (Java classes if applicable)}
+
+\section{System/model implementation description}
+        
+\subsection{Procedure/Object Diagram}
+    
+\subsection{Interfaces to the basic software}     
+
+
+\section{Experiment Description}
+
+\subsection{Data (corpora)}
+
+                         i.       Number of documents/instances
+
+                        ii.      Number of categories
+
+                      iii.      Number of features
+
+\subsection{Parameterization (thresholds and other values)}
+
+\subsection{Number of documents in test and training set}
+
+\subsection{If used, also describe the validation-set}
+
+\section{Result presentation:}
+
+\subsection{For all categories (Microaverage and Macroaverage of Precision, Recall and F1-measure)}
+
+\subsection{Single category}
+
+\subsection{Baseline systems or previous work systems' results}
+
+\subsection{Comparative Tables from the baseline to the best model (passing trough the other models)}
+
+\subsection {Precision/Recall graph by varying threshold}
+
+\section {Discussion}
+
+\subsection {Basic considerations on the starting software and the obtained improvement (of such software)}
+
+\subsection {Implementation problems and some characteristics of implemantation (e.g. computational complexity, execution time and usability).}
+
+\subsection {Comparison among different presented models  (explanation of the improvement or decrease in accuracy)}
+
+\section {Conclusion}
+
+\subsection {The  main  (and few) main points and results of your work}
+
+ 
+
+
+\end{document}
