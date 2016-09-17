@@ -33,7 +33,7 @@
 \newcommand{\mono}[1]{\texttt{#1}}
 %\newcommand{\mono}[1]{\texttt{\textbf{#1}}}
 
-\title{Implementation of BenOR algorithm using C++ and MPI}
+\title{Sentence compressor}
 
 \author{Aliaksandr Siarohin}
 
@@ -49,7 +49,7 @@
 
      {
      \large \bfseries Master Degree in Computer Science\\[3mm] 
-     Distributed Algorithms\\[3mm]
+     Natural Language Processing\\[3mm]
      AA 2015-2016
      }\\[10mm]
 
@@ -78,7 +78,7 @@
 \begin{abstract}
 
 \textit{
-  This is a description of project on distributed algorithms course.
+  This is a description of project on natural language processing.
 }
 
 
@@ -88,64 +88,103 @@
 
 
 
-\section {Introduction to the designed system/experiment (project work)}
+\section {Introduction to the designed system}
+In this project I implement an neural network solution to deletion-based sentence compression where the task is to translate a sentence into a sequence of zeros and ones, corresponding to token deletion decisions.
 
 \section {The analytical model}
 
-\subsection{Pre-processing (stemming, lemmatization, tokenization…)}
+\subsection{Pre-processing}
+The data was initially in json format. To parse json I use script provided by teaching assistant. After parsing the data become the list of list with tokens. Each token is tuple with 3 field (word, tag, stem, token deletion decision). I populate this tuple with additional field word embedding. This embedding is taken from google-news word2vec \url{https://code.google.com/archive/p/word2vec/}.
 
-\subsection{Weigthing Schemes (if used)}
+\subsection{Formal description of neural network architecture}
+I use LSTM based network for this problem. The input to my network is word embedding and one hot encoding of word tag. Then there is 2 LSTM layers one which traverse the sentence from the beginning and the other which traverse it from the end. The output of this layer go to dropout layer, and the output of dropout go to the same 2 LSTM layers. Then there is dense layer with dropout. And finally dense layer with softmax non-linearity. The network structure can be found in \cref{fig:network}.
 
-\subsection{Feature Selectors if used}
-    
-\subsection{ Formal description of any new model added}   
-        
-\section{Initial Software description (brief)}
+\begin{figure}[t]%
+	\centering
+	\includegraphics[width=230pt]{compression_network}
+	\caption{The network architecture}%
+	\label{fig:network}%
+\end{figure}
+
+
+\section{Software description}
+To implement this project I use python library's theano+lasagne. This framework can build a graph of execution, and then evaluate it on gpu.
 
 \subsection{Used Functions}
-
-\subsection{Interface (Java classes if applicable)}
-
-\section{System/model implementation description}
-        
-\subsection{Procedure/Object Diagram}
-    
-\subsection{Interfaces to the basic software}     
-
+I use different network layers from lasagne library (LSTMLayer, DropoutLayer, DenseLayer ...). For fitting network I use adam function from lasagne library.
 
 \section{Experiment Description}
 
-\subsection{Data (corpora)}
+\subsection{Data}
+Data is 10000 sentences. For each word in sentence there is stem form of this word and tag of this word. Each word has associated token deletion decisions (0 or 1). For the experiment I split the data in 3 sets: train, dev and test. Test set is 1000 first sentences, train and dev set is random split of the rest 9000 sentences, 1000 for dev and 8000 for train.
 
-                         i.       Number of documents/instances
 
-                        ii.      Number of categories
+\subsection{Training process}
+The network is trained using adam method. The batch in my case was 1 sentence. The sentences are feed to network in random order. The training process takes 4 epochs. After each 1000 sentences I compute score for dev set and save network parameters. The network with the best score on validation set will be result. 
 
-                      iii.      Number of features
+\subsection{Network parameters}
+The size of word embedding is 300 (Because in google-news dataset it 300). The number of units in LSTM layer is 200, as well as in tag embedding. The size of last dense layer is also 200. Last layer give us probability, so in order to get 0, 1 predictions we need some threshold. In my case this threshold maximizing the f1 score on dev set and it equal to 0.505582.
 
-\subsection{Parameterization (thresholds and other values)}
+\section{Result presentation}
+The result score on the test set:
 
-\subsection{Number of documents in test and training set}
+\begin{itemize}
+  \item Per token accuracy: 0.832198
+  \item Per token f1 score: 0.867230
+  \item Fraction of right compression 0.162000
+\end{itemize}
 
-\subsection{If used, also describe the validation-set}
+The learning curves can be found in \cref{fig:lcur}. The Precision/Recall curve can be found in \cref{fig:pr}.
 
-\section{Result presentation:}
+\begin{figure}[t]%
+	\centering
+	\includegraphics[width=\columnwidth]{learning_curves}
+	\caption{The learning curves on train and dev sets}%
+	\label{fig:lcur}%
+\end{figure}
 
-\subsection{For all categories (Microaverage and Macroaverage of Precision, Recall and F1-measure)}
 
-\subsection{Single category}
+\begin{figure}[t]%
+	\centering
+	\includegraphics[width=\columnwidth]{precision_recal_curve}
+	\caption{The Precision/Recall curve}%
+	\label{fig:pr}%
+\end{figure}
 
-\subsection{Baseline systems or previous work systems' results}
+The table with compression examples can be found in \cref{table:gc} for good compression and \cref{table:b} for bad compression.
 
-\subsection{Comparative Tables from the baseline to the best model (passing trough the other models)}
+\begin{table}
+\centering
+\caption{Good compression}
+\label{table:gc}
+\csvreader[tabular=p{150pt}p{100pt}p{100pt},
+    table head=\toprule Starting sentence & Reference  &  Predicted \\\midrule,
+    table foot=\bottomrule,
+    filter={\value{csvrow}<6}
+]%
+{good_compressions.csv}{Phrase=\Phrase,True=\True, Predicted=\Predicted}%
+{\Phrase & \True & \Predicted \\\midrule}%
+\end{table}
 
-\subsection {Precision/Recall graph by varying threshold}
+
+\begin{table}
+\centering
+\caption{Bad compression}
+\label{table:b}
+\csvreader[tabular=p{150pt}p{100pt}p{100pt},
+    table head=\toprule Starting sentence & Reference  &  Predicted \\\midrule,
+    table foot=\bottomrule,
+    filter={\value{csvrow}<6}
+]%
+{bad_compressions.csv}{Phrase=\Phrase,True=\True, Predicted=\Predicted}%
+{\Phrase & \True & \Predicted \\\midrule}%
+\end{table}
 
 \section {Discussion}
 
 \subsection {Basic considerations on the starting software and the obtained improvement (of such software)}
 
-\subsection {Implementation problems and some characteristics of implemantation (e.g. computational complexity, execution time and usability).}
+\subsection {Implementation problems and some characteristics of implementation (e.g. computational complexity, execution time and usability).}
 
 \subsection {Comparison among different presented models  (explanation of the improvement or decrease in accuracy)}
 
