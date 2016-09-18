@@ -94,7 +94,7 @@ In this project I implement an neural network solution to deletion-based sentenc
 \section {The analytical model}
 
 \subsection{Pre-processing}
-The data was initially in json format. To parse json I use script provided by teaching assistant. After parsing the data become the list of list with tokens. Each token is tuple with 3 field (word, tag, stem, token deletion decision). I populate this tuple with additional field word embedding. This embedding is taken from google-news word2vec \url{https://code.google.com/archive/p/word2vec/}.
+The data was initially in json format. To parse json I use script provided by teaching assistant. After parsing the data become the list of list with tokens. Each token is tuple with 4 field (word, tag, stem, token deletion decision). I populate this tuple with additional field word embedding. This embedding is taken from google-news word2vec \url{https://code.google.com/archive/p/word2vec/}.
 
 \subsection{Formal description of neural network architecture}
 I use LSTM based network for this problem. The input to my network is word embedding and one hot encoding of word tag. Then there is 2 LSTM layers one which traverse the sentence from the beginning and the other which traverse it from the end. The output of this layer go to dropout layer, and the output of dropout go to the same 2 LSTM layers. Then there is dense layer with dropout. And finally dense layer with softmax non-linearity. The network structure can be found in \cref{fig:network}.
@@ -129,9 +129,9 @@ The size of word embedding is 300 (Because in google-news dataset it 300). The n
 The result score on the test set:
 
 \begin{itemize}
-  \item Per token accuracy: 0.832198
-  \item Per token f1 score: 0.774660
-  \item Fraction of right compression 0.162000
+  \item Per token accuracy: 0.827522
+  \item Per token f1 score: 0.768665
+  \item Fraction of right compression 0.163000
 \end{itemize}
 
 The learning curves can be found in \cref{fig:lcur}. The Precision/Recall curve can be found in \cref{fig:pr}.
