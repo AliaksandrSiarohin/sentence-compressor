@@ -89,15 +89,15 @@
 
 
 \section {Introduction to the designed system}
-In this project I implement an neural network solution to deletion-based sentence compression where the task is to translate a sentence into a sequence of zeros and ones, corresponding to token deletion decisions.
+In this project, I implement a neural network solution to deletion-based sentence compression where the task is to translate a sentence into a sequence of zeros and ones, corresponding to token deletion decisions. I use architecture similar to one proposed in \cite{lstm}. My network is multiple LSTM layers stacked together. This network takes words embeddings from word2vec as an input and produces the probability of token deletion decision.
 
-\section {The analytical model}
+\section {The analytic model}
 
 \subsection{Pre-processing}
-The data was initially in json format. To parse json I use script provided by teaching assistant. After parsing the data become the list of list with tokens. Each token is tuple with 4 field (word, tag, stem, token deletion decision). I populate this tuple with additional field word embedding. This embedding is taken from google-news word2vec \url{https://code.google.com/archive/p/word2vec/}.
+The data were initially in json format. To parse json I use script provided by teaching assistant. After parsing the data become the list of lists with tokens. Each token is tuple with 4 field (word, tag, stem, token deletion decision). I populate this tuple with an additional field, word embedding. This embedding comes from google-news word2vec \url{https://code.google.com/archive/p/word2vec/}.
 
 \subsection{Formal description of neural network architecture}
-I use LSTM based network for this problem. The input to my network is word embedding and one hot encoding of word tag. Then there is 2 LSTM layers one which traverse the sentence from the beginning and the other which traverse it from the end. The output of this layer go to dropout layer, and the output of dropout go to the same 2 LSTM layers. Then there is dense layer with dropout. And finally dense layer with softmax non-linearity. The network structure can be found in \cref{fig:network}.
+I use LSTM network for this problem. The input to the network is word embedding and one hot encoding of word tag. Then there is 2 bidirectional LSTM layers separated by dropout layer. Then there is a dense layer with a dropout. And finally dense layer with softmax non-linearity. The network structure is in \cref{fig:network}.
 
 \begin{figure}[t]%
 	\centering
@@ -111,19 +111,22 @@ I use LSTM based network for this problem. The input to my network is word embed
 To implement this project I use python library's theano+lasagne. This framework can build a graph of execution, and then evaluate it on gpu.
 
 \subsection{Used Functions}
-I use different network layers from lasagne library (LSTMLayer, DropoutLayer, DenseLayer ...). For fitting network I use adam function from lasagne library.
+I use different network layers from lasagne library (LSTMLayer, DropoutLayer, DenseLayer ...). Also, I use adam function from lasagne library for fitting the network.
 
 \section{Experiment Description}
 
 \subsection{Data}
-Data is 10000 sentences. For each word in sentence there is stem form of this word and tag of this word. Each word has associated token deletion decisions (0 or 1). For the experiment I split the data in 3 sets: train, dev and test. Test set is 1000 first sentences, train and dev set is random split of the rest 9000 sentences, 1000 for dev and 8000 for train.
+Data consist of 10000 sentences. For each word in sentence there is stem form of this word and tag of this word. Each word has associated token deletion decisions (0 or 1). For the experiment I split the data in 3 sets: train, dev and test. The test set consists of 1000 sentences from the beginning, train and dev set is a random split of the rest 9000 sentences, 1000 for dev and 8000 for train.
 
 
 \subsection{Training process}
-The network is trained using adam method. The batch in my case was 1 sentence. The sentences are feed to network in random order. The training process takes 4 epochs. After each 1000 sentences I compute score for dev set and save network parameters. The network with the best score on validation set will be result. 
+I train the network using adam method. The batch in my case is 1 sentence. The sentences are feed to network in random order. The training process takes 4 epochs. After each 1000 sentences, I compute score for dev set and save network parameters. The network with the best score on validation set will be resulting.
 
 \subsection{Network parameters}
-The size of word embedding is 300 (Because in google-news dataset it 300). The number of units in LSTM layer is 200, as well as in tag embedding. The size of last dense layer is also 200. Last layer give us probability, so in order to get 0, 1 predictions we need some threshold. In my case this threshold maximizing the f1 score on dev set and it equal to 0.505582.
+The size of word embedding is 300 (Because in google-news dataset it is 300). The number of units in LSTM layer is 200, as well as in tag embedding. The size of last dense layer is also 200. The last layer gives us probability, so to get 0, 1 predictions we need some threshold. In my case this threshold maximize the f1 score on dev set, and it is equal to 0.505582.
+
+\subsection{Source code}
+Sorce code is single ipython notebook. I upload it on github. You can view it using the following link: \url{https://github.com/AliaksandrSiarohin/sentence-compressor}.
 
 \section{Result presentation}
 The result score on the test set:
@@ -131,10 +134,10 @@ The result score on the test set:
 \begin{itemize}
   \item Per token accuracy: 0.827522
   \item Per token f1 score: 0.768665
-  \item Fraction of right compression 0.163000
+  \item Fraction of right compression: 0.163000
 \end{itemize}
 
-The learning curves can be found in \cref{fig:lcur}. The Precision/Recall curve can be found in \cref{fig:pr}.
+The learning curves is in \cref{fig:lcur}. The Precision/Recall curve is in \cref{fig:pr}.
 
 \begin{figure}[t]%
 	\centering
@@ -151,7 +154,33 @@ The learning curves can be found in \cref{fig:lcur}. The Precision/Recall curve 
 	\label{fig:pr}%
 \end{figure}
 
-The table with compression examples can be found in \cref{table:gc} for good compression and \cref{table:b} for bad compression.
+The table with compression examples is in \cref{table:gc} for good compression, and \cref{table:b} for bad compression.
+
+
+
+\section {Comparison with other solutions}
+This problem has already been addressed in \cite{lstm} and \cite{gaze_lstm}.
+
+The first one use approche similar to my own, but with 3 LSTM layers and additional features such as:
+\begin{itemize}
+\item The embedding vector for the parent word
+\item The label predicted for the last word
+\item A bit indicating whether the parent word has already been seen and kept in the compression
+\item A bit indicating whether the parent word has already  been  seen  but  discarded
+\item A  bit  indicating  whether  the  parent  word comes later in the input
+\end{itemize}
+In this paper, they also use a larger corpus for training about 2 million sentences. Their f1 score 0.81.
+
+The second one also using 3 LSTM layers and same amount of data as my model, but they take eye-tracking recording as an additional feature. Their f1 score 0.8097.
+
+
+\section {Conclusion}
+In this project, I implement a neural network solution to deletion-based sentence compression. Resulting network shows good results on phrases with one subject and predicate. But not very good at phrases without subject, as well as complex phrases with 2 or more subjects.
+
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+\newpage 
 
 \begin{table}
 \centering
@@ -179,12 +208,5 @@ The table with compression examples can be found in \cref{table:gc} for good com
 {bad_compressions.csv}{Phrase=\Phrase,True=\True, Predicted=\Predicted}%
 {\Phrase & \True & \Predicted \\\midrule}%
 \end{table}
-
-
-\section {Conclusion}
-In this project I implement an neural network solution to deletion-based sentence compression. Resulting network show good results on phrases with one subject and predicate. But not very good at phrases without subject, as well as complex phrases with 2 or more subjects.
-
- 
-
 
 \end{document}
